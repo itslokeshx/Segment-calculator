@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Segment Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Fonts: npm uses Inter primarily, with fallback to IBM Plex Sans -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+  <style>
+    :root {
+      --black: #101112;
+      --white: #fff;
+      --card: #19191b;
+      --gray1: #dedede;
+      --gray2: #bdbdbd;
+      --gray3: #39393c;
+      --border: #242427;
+      --radius: 24px;
+      --mobile-width: 100vw;
+      --mobile-height: 100svh;
+      --desktop-max: 410px;
+      --shadow: 0 2px 24px #0006;
+    }
+    html, body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', 'IBM Plex Sans', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100svh;
+      width: 100vw;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100svh;
+      width: 100vw;
+      overflow-x: hidden;
+      padding: 0;
+    }
+    .container {
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      box-sizing: border-box;
+      min-height: 70vh;
+      margin: 0 auto;
+      margin-top: 40px;
+      padding: 2.2em 1.2em 2em 1.2em;
+      width: 100vw;
+      max-width: var(--desktop-max);
+      transition: border-radius .25s, box-shadow .18s;
+    }
+    @media (max-width: 800px) {
+      .container {
+        width: var(--mobile-width);
+        min-height: var(--mobile-height);
+        max-width: 100vw;
+        border-radius: 0;
+        margin: 0;
+        padding: 2.3em 5vw 2.1em 5vw;
+        box-shadow: none;
+      }
+    }
+    @media (max-width: 440px) {
+      .container {
+        min-height: var(--mobile-height);
+        padding: 1.34em 2vw 2.7em 2vw;
+      }
+    }
+    .app-title {
+      font-family: 'Inter', 'IBM Plex Sans', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 1.36rem;
+      text-align: center;
+      color: var(--gray1);
+      margin-bottom: 1.24em;
+      letter-spacing: .7px;
+      text-shadow: 0 2.5px 20px #0002;
+      margin-top: .2em;
+      width: 100%;
+    }
+    .inputs-row {
+      display: flex;
+      gap: .82rem;
+      width: 100%;
+      margin-bottom: .9rem;
+      justify-content: center;
+    }
+    .segment-row {
+      margin: 0.17em 0 1.55em 0;
+      gap: .43rem;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 32%;
+      min-width: 72px;
+      flex: 1 1 67px;
+    }
+    .input-group label {
+      font-size: .95rem;
+      color: var(--gray2);
+      margin-bottom: 3px;
+      font-weight: 600;
+      padding-left: 1px;
+      font-family: inherit;
+    }
+    .number-input,
+    .segment-input,
+    select {
+      border: none;
+      border-radius: 7px;
+      background: var(--gray3);
+      color: var(--white);
+      font-size: 1.1rem;
+      width: 100%;
+      min-width: 54px;
+      outline: none;
+      box-sizing: border-box;
+      height: 2.2em;
+      font-family: inherit;
+      margin-bottom: 0.11rem;
+      padding-left: 0.42em;
+      padding-right: 0.39em;
+      border: 1px solid var(--border);
+      transition: border .14s, box-shadow .13s;
+    }
+    .number-input:focus,
+    .segment-input:focus,
+    select:focus {
+      border: 1.5px solid var(--gray1);
+      box-shadow: 0 0 0 2px #dedede25;
+    }
+    .segment-input { min-width: 74px;}
+    select {
+      background: var(--gray3);
+      color: var(--white);
+      min-width: 82px;
+    }
+    .calculate-btn {
+      width: 100%;
+      margin-top: 0.44em;
+      background: var(--gray1);
+      color: var(--black);
+      font-family: 'Inter','IBM Plex Sans',Arial,sans-serif;
+      font-weight: 600;
+      padding: 0.88em 0;
+      font-size: 1.13rem;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      letter-spacing: .18px;
+      margin-bottom: 1.13em;
+      transition: background .12s, color .14s, box-shadow .12s;
+      box-shadow: 0 1px 7px #fff1;
+    }
+    .calculate-btn:hover,
+    .calculate-btn:focus {
+      background: var(--white);
+      color: var(--black);
+    }
+    .output-card {
+      width: 100%;
+      margin-top: .09rem;
+      background: #161618;
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 1em .6em .97em .6em;
+      font-size: 1.10rem;
+      text-align: center;
+      border: 1px solid var(--border);
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.13em;
+      min-height: 2.3rem;
+      box-sizing: border-box;
+      margin-bottom: .5em;
+      transition: border-radius .23s;
+    }
+    .segments-result {
+      font-family: inherit;
+      font-weight: 700;
+      color: var(--gray1);
+      font-size: 1.4rem;
+      letter-spacing: 1.3px;
+      margin: .25em 0 .11em 0;
+    }
+    .unit-label {
+      font-size: .95em;
+      color: var(--gray2);
+      margin-bottom: 2.5px;
+    }
+    @media (max-width: 600px) {
+      .inputs-row { gap: .1rem; }
+      .segment-row { gap: .09rem; }
+      .number-input, .segment-input, select { font-size: .97rem;}
+      .input-group { min-width: 49px;}
+      .app-title { font-size: 1.08rem;}
+      .output-card { font-size: .991rem; padding: .93em .12em .83em .12em;}
+      .segments-result { font-size: 1.04rem;}
+    }
+    @media (max-width: 420px) {
+      .output-card, .app-title, .segments-result { font-size: .93rem;}
+      .container { padding: 1em 0vw 1.5em 0vw;}
+      .segments-result { font-size: .83rem;}
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      background: var(--card);
+      color: var(--gray2);
+      font-family: inherit;
+      font-size: .97em;
+      letter-spacing: 0.01em;
+      padding: 1.2em 0 1.25em 0;
+      text-align: center;
+      border-top: 1.5px solid var(--border);
+      box-sizing: border-box;
+      margin-top: auto;
+      /* On mobile, footer is at the bottom */
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+    }
+    @media (min-width: 450px) {
+      .footer { position: static; padding: 1.55em 0 1.25em 0;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="app-title">Video Segments Calculator</div>
+    <form onsubmit="event.preventDefault(); calcSegments();">
+      <div class="inputs-row">
+        <div class="input-group">
+          <label for="hours">Hours</label>
+          <input type="number" min="0" step="1" id="hours" class="number-input" value="0">
+        </div>
+        <div class="input-group">
+          <label for="minutes">Minutes</label>
+          <input type="number" min="0" max="59" step="1" id="minutes" class="number-input" value="0">
+        </div>
+        <div class="input-group">
+          <label for="seconds">Seconds</label>
+          <input type="number" min="0" max="59" step="1" id="seconds" class="number-input" value="0">
+        </div>
+      </div>
+      <div class="inputs-row segment-row">
+        <div class="input-group">
+          <label for="clip-length">Clip Length</label>
+          <input type="number" min="1" step="1" id="clip-length" class="segment-input" value="30">
+        </div>
+        <div class="input-group">
+          <label for="segment-type">Unit</label>
+          <select id="segment-type">
+            <option value="seconds">Seconds</option>
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="calculate-btn">Calculate Segments</button>
+    </form>
+    <div class="output-card" id="output">
+      <span style="color:var(--gray2);font-size:.99em;">Enter values and tap <b>Calculate Segments</b>!</span>
+    </div>
+  </div>
+  <div class="footer">Made to simplify segment calculations for YaaziCut</div>
+  <script>
+    function timeToSeconds(h, m, s) {
+      return (parseInt(h) || 0) * 3600 + (parseInt(m) || 0) * 60 + (parseInt(s) || 0);
+    }
+    function lengthToSeconds(val, type) {
+      val = parseFloat(val);
+      if (isNaN(val) || val <= 0) return 0;
+      if (type === 'hours') return val * 3600;
+      if (type === 'minutes') return val * 60;
+      return val;
+    }
+    function calcSegments() {
+      const hrs = document.getElementById('hours').value,
+            mins = document.getElementById('minutes').value,
+            secs = document.getElementById('seconds').value;
+      const clipVal = document.getElementById('clip-length').value,
+            clipType = document.getElementById('segment-type').value;
+      const totalSecs = timeToSeconds(hrs, mins, secs),
+            clipSecs = lengthToSeconds(clipVal, clipType);
+      const out = document.getElementById('output');
+      if (totalSecs <= 0 || clipSecs <= 0) {
+        out.innerHTML = `<span style="color:var(--gray1);">Please enter valid values for video duration and clip length.</span>`;
+        return;
+      }
+      const segments = Math.ceil(totalSecs / clipSecs);
+      out.innerHTML = `
+        <div style="margin-bottom:7px;">Video duration: <b>${hrs}h ${mins}m ${secs}s</b></div>
+        <div class="unit-label">Clip length: <b>${clipVal} ${clipType}</b></div>
+        <div class="segments-result">${segments}</div>
+        <span class="unit-label"><b>SEGMENTS REQUIRED</b></span>
+      `;
+    }
+    // Make "Enter" key trigger calculation
+    document.querySelectorAll('input,select').forEach(el=>{
+      el.addEventListener('keypress',function(e){
+        if(e.key==='Enter'){calcSegments();e.preventDefault();}
+      });
+    });
+  </script>
+</body>
+</html>
